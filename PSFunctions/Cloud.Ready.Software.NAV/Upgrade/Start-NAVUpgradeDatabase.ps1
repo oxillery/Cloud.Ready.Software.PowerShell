@@ -5,7 +5,8 @@
         Upgrades a database the classic way: applies a fob-file on a converted database
     #>
     [CmdLetBinding()]
-    param(        
+    param(       
+        [String] $Name,   
         [String] $DatabaseBackupFile,
         [String] $ResultObjectFile,
         [String] $WorkingFolder,
@@ -26,8 +27,12 @@
     $LogImportObjects  = Join-path $Logfolder '03_ImportObjects'
     $LogCompileObjects = Join-path $Logfolder '04_CompileObjects'
     $LogExportObjects  = Join-path $Logfolder '05_ExportObjects'
-
-    $SandboxServerInstance = Get-SQLBackupDatabaseName -Backupfile $DatabaseBackupFile -ErrorAction Stop
+    
+    if (!$name) {
+        $SandboxServerInstance = Get-SQLBackupDatabaseName -Backupfile $DatabaseBackupFile -ErrorAction Stop
+    } else {
+        $SandboxServerInstance = $Name
+    }
 
     #Create database in new version
     Write-Host 'Restore modified backup and create as instance' -ForegroundColor Green
