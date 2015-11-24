@@ -13,7 +13,9 @@
         [String] $UpgradeToolkit,
         [Object[]] $DeletedObjects,
         [ValidateSet('ForceSync','Sync')]
-        [String] $SyncMode='Sync'
+        [String] $SyncMode='Sync',
+        [ValidateSet('Overwrite','Use')]
+        [String] $IfResultDBExists='Overwrite'
     )
     
     #Creating Workspace
@@ -31,10 +33,17 @@
     Write-Host 'Restore modified backup and create as instance' -ForegroundColor Green
     
     $Exists = Get-NAVServerInstance $SandboxServerInstance
-    if ($Exists) {
-        Remove-NAVEnvironment -ServerInstance $SandboxServerInstance -ErrorAction Stop
+    if ($Exists) {   
+        if ($IfResultDBExists -eq 'Overwrite') {    
+            Remove-NAVEnvironment -ServerInstance $SandboxServerInstance -ErrorAction Stop
+            New-NAVEnvironment -ServerInstance $SandboxServerInstance -BackupFile $DatabaseBackupFile -EnablePortSharing -ErrorVariable $ErrorNewNAVEnvironment -ErrorAction SilentlyContinue
+        } else {
+            Write-Warning "ServerInstance $SandboxServerInstance already exists.  This script is re-using it."
+        }
+    } else {
+        New-NAVEnvironment -ServerInstance $SandboxServerInstance -BackupFile $DatabaseBackupFile -EnablePortSharing -ErrorVariable $ErrorNewNAVEnvironment -ErrorAction SilentlyContinue
     }
-    New-NAVEnvironment -ServerInstance $SandboxServerInstance -BackupFile $DatabaseBackupFile -EnablePortSharing -ErrorVariable $ErrorNewNAVEnvironment -ErrorAction SilentlyContinue
+    
     if ($ErrorNewNAVEnvironment) {
         if (!($ErrorNewNAVEnvironment -match 'failed to reach status ''Running''')){
             write-error $ErrorNewNAVEnvironment
