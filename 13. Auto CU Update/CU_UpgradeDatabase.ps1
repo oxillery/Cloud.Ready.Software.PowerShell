@@ -8,7 +8,7 @@ $IsoFile =
 
 Get-NAVCumulativeUpdateDownloadVersionInfo -SourcePath $CUDownloadFile
 
-Repair-NAVApplication -DVDFolder $DVDFolder
+Repair-NAV -DVDFolder $DVDFolder
 
 #TODO: Load NA Cmdlets?
 

@@ -9,9 +9,9 @@ $IsoFile =
         -CumulativeUpdateFullPath $CUDownloadFile `
         -IsoDirectory $IsoDirectory
 
-Repair-NAVApplicationFromISO -ISOFilePath $IsoFile -Log 'c:\TEMP\Log.txt'
+Repair-NAVFromISO -ISOFilePath $IsoFile -Log 'c:\TEMP\Log.txt'
 
 Get-NAVVersion
 
-Uninstall-NAVApplicationFromISO -ISOFilePath $IsoFile -Log 'c:\TEMP\Log.txt'
+UnInstall-NAVFromISO -ISOFilePath $IsoFile -Log 'c:\TEMP\Log.txt'
 Drop-SQLDatabaseIfExists -Databasename 'NAV2016'

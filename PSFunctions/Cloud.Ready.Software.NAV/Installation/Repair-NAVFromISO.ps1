@@ -1,4 +1,4 @@
-﻿function Repair-NAVApplicationFromISO
+﻿function Repair-NAVFromISO
 {
     [CmdletBinding()]
     Param
@@ -20,7 +20,7 @@
         $DVDFolder = "$($IsoImage.DriveLetter):\"
         write-host "Mounted ISO to $($IsoImage.DriveLetter)-Drive" -ForegroundColor Green
     
-        Repair-NAVApplication -DVDFolder $DVDFolder -Log $Log
+        Repair-NAV -DVDFolder $DVDFolder -Log $Log
 
         $null = Dismount-DiskImage -ImagePath $ISOFilePath
         write-host "Dismounted $($IsoImage.DriveLetter)-Drive" -ForegroundColor Green

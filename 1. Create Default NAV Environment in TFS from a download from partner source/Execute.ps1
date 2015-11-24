@@ -9,7 +9,7 @@ $VersionInfo = Get-NAVCumulativeUpdateDownloadVersionInfo -SourcePath $ZippedDVD
 
 $InstallationPath = Unzip-NAVCumulativeUpdateDownload -SourcePath $ZippedDVDfile -DestinationPath $DVDDestination
 
-$InstallationResult = Install-NAVApplication -DVDFolder $InstallationPath -Configfile (Join-Path $PSScriptRoot 'InstallConfig.xml') 
+$InstallationResult = Install-NAV -DVDFolder $InstallationPath -Configfile (Join-Path $PSScriptRoot 'InstallConfig.xml') 
 
 break
 
@@ -31,4 +31,4 @@ Export-NAVApplicationObject `
 
 break
 
-Uninstall-NAVApplication -DVDFolder $InstallationPath
+UnInstall-NAV -DVDFolder $InstallationPath

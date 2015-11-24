@@ -1,4 +1,4 @@
-﻿function Install-NAVApplication
+﻿function Install-NAV
 {
     [CmdletBinding()]
     Param

@@ -1,4 +1,4 @@
-﻿function Install-NAVApplicationFromISO
+﻿function Install-NAVFromISO
 {
     <#
         .SYNOPSIS
@@ -30,7 +30,7 @@
     $DVDFolder = "$($IsoImage.DriveLetter):\"
     write-host "Mounted ISO to $($IsoImage.DriveLetter)-Drive" -ForegroundColor Green
     
-    $InstallationResult = Install-NAVApplication -DVDFolder $DVDFolder -Configfile $ConfigFile -LicenseFile $Licensefile -Log $Log
+    $InstallationResult = Install-NAV -DVDFolder $DVDFolder -Configfile $ConfigFile -LicenseFile $Licensefile -Log $Log
     
     $null = Dismount-DiskImage -ImagePath $ISOFilePath
     write-host "Dismounted $($IsoImage.DriveLetter)-Drive" -ForegroundColor Green

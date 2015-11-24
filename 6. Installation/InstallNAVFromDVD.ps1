@@ -2,7 +2,7 @@
 $NAVDVD         = 'D:\'
 $ConfigFile     = join-path $PSScriptRoot 'FullInstallNAV2016.xml'
 
-$InstallationResult = Install-NAVApplication -DVDFolder $NAVDVD -Configfile $ConfigFile
+$InstallationResult = Install-NAV -DVDFolder $NAVDVD -Configfile $ConfigFile
 
 $null = Import-Module (join-path $InstallationResult.TargetPathX64 'service\navadmintool.ps1' )
 

@@ -1,4 +1,4 @@
-﻿function Uninstall-NAVApplicationFromISO
+﻿function UnInstall-NAVFromISO
 {
     <#
         .SYNOPSIS
@@ -19,7 +19,7 @@
     $DVDFolder = "$($IsoImage.DriveLetter):\"
     write-host "Mounted ISO to $($IsoImage.DriveLetter)-Drive" -ForegroundColor Green
     
-    Uninstall-NAVApplication -DVDFolder $DVDFolder -Log $Log
+    UnInstall-NAV -DVDFolder $DVDFolder -Log $Log
     
     Dismount-DiskImage -ImagePath $ISOFilePath
     write-host "Dismounted $($IsoImage.DriveLetter)-Drive" -ForegroundColor Green
