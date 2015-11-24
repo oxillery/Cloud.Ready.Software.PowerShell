@@ -39,7 +39,7 @@ if ($NumberOfFails -ge 1){
     write-host 'Failed objects:' -foregroundcolor Green
 
     Foreach($item in ($MergeResult.Mergeresult | Where-Object {$_.MergeResult –eq 'Failed'})){
-        Write-Host "  $($Item.ObjectType) - $($Item.Id): $($Item.ErrorMessage)" -ForeGroundColor Gray
+        Write-Host "  $($Item.ObjectType) - $($Item.Id): $($Item.Error)" -ForeGroundColor Gray
     }
 }
 
