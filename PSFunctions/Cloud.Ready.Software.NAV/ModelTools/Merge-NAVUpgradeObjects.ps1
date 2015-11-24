@@ -58,7 +58,7 @@
         -ResultPath $MergeResultFolder `
         -DateTimeProperty FromModified `
         -ModifiedProperty FromModified `
-        -VersionListProperty Clear `
+        -VersionListProperty FromModified `
         -DocumentationConflict TargetFirst `
         -Force
     
