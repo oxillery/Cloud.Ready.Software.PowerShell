@@ -4,7 +4,7 @@ function Invoke-SQL {
     param(
         [string] $DatabaseServer = [net.dns]::gethostname(),
         [String] $DatabaseInstance = '',
-        [string] $DatabaseName = 'Master',
+        [string] $DatabaseName = 'master',
         [string] $SQLCommand = $(throw 'Please specify a query.')
       )
 
