@@ -1,7 +1,7 @@
-﻿$ZipFIle = 'C:\_installs\Dynamics.90.BE.1769455.DVD.zip'
-$TmpLocation = 'C:\Temp'
-$ISOName = 'NAV2016RTM_BE'
-$IsoFileName = 'C:\_Installs' + "\$ISOName.iso"
+﻿$ZipFIle = 'G:\Installs\Dynamics.90.BE.1769455.DVD.zip'
+$TmpLocation = 'G:\Temp'
+$ISOName = 'NAV2016CU1_BE'
+$IsoFileName = 'G:\Installs' + "\$ISOName.iso"
 
 
 IF (Test-Path $TmpLocation){

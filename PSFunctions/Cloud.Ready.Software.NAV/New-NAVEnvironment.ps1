@@ -2,6 +2,8 @@
     [CmdletBinding()]
     param(
         [String]$ServerInstance,
+        [String]$DatabaseServer='.',
+        [String]$DatabaseInstance='',
         [String]$Databasename='',
         [String]$BackupFile,
         [switch]$EnablePortSharing,
@@ -20,12 +22,13 @@
     }
 
     write-Host -ForegroundColor Green "Restoring Backup $BackupFile to $Databasename"
-    Restore-SQLBackupFile -BackupFile $BackupFile -DatabaseName $Databasename -ErrorAction Stop
+    Restore-SQLBackupFile -BackupFile $BackupFile -DatabaseServer $DatabaseServer -DatabaseInstance $DatabaseInstance -DatabaseName $Databasename -ErrorAction Stop
 
     write-Host -ForegroundColor Green "Creating ServerInstance $ServerInstance"
     $Object = New-NAVServerInstance `
             -ServerInstance $ServerInstance `
-            -DatabaseServer localhost `
+            -DatabaseServer $DatabaseServer `
+            -DatabaseInstance $DatabaseInstance `
             -ManagementServicesPort 7045 `
             -ClientServicesPort 7046 `
             -DatabaseName $Databasename          

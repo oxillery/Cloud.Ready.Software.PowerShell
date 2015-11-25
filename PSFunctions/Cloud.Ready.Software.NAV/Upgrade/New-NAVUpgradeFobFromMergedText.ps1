@@ -13,7 +13,7 @@
     )
 
     
-    $TargetServerInstanceObject = Get-NAVServerInstance -ServerInstance $TargetServerInstance -ErrorAction Stop
+    $TargetServerInstanceObject = Get-NAVServerInstance4 -ServerInstance $TargetServerInstance -ErrorAction Stop
     $WorkingServerInstance = "$($TargetServerInstance)_Sandbox"
 
     #Creating Workspace
@@ -29,13 +29,13 @@
     
     #Make Admin user DB-Owner
     $CurrentUser = [environment]::UserDomainName + '\' + [Environment]::UserName
-    Invoke-SQL -DatabaseName $WorkingServerInstance -SQLCommand "CREATE USER [$CurrentUser] FOR LOGIN [$CurrentUser]" -ErrorAction Continue
-    Invoke-SQL -DatabaseName $WorkingServerInstance -SQLCommand "ALTER ROLE [db_owner] ADD MEMBER [$CurrentUser]" -ErrorAction Continue
+    Invoke-SQL -DatabaseServer $TargetServerInstanceObject.DatabaseServer -DatabaseInstance $TargetServerInstanceObject.DatabaseInstance -DatabaseName $WorkingServerInstance -SQLCommand "CREATE USER [$CurrentUser] FOR LOGIN [$CurrentUser]" -ErrorAction Continue
+    Invoke-SQL -DatabaseServer $TargetServerInstanceObject.DatabaseServer -DatabaseInstance $TargetServerInstanceObject.DatabaseInstance -DatabaseName $WorkingServerInstance -SQLCommand "ALTER ROLE [db_owner] ADD MEMBER [$CurrentUser]" -ErrorAction Continue
 
     #Drop ReVision Triggers
-    Invoke-SQL -DatabaseName $WorkingServerInstance -SQLCommand 'DISABLE TRIGGER [dbo].[REVISION_UPDATE] ON [dbo].[Object]' -ErrorAction Continue
-    Invoke-SQL -DatabaseName $WorkingServerInstance -SQLCommand 'DISABLE TRIGGER [dbo].[REVISION_INSERT] ON [dbo].[Object]' -ErrorAction Continue
-    Invoke-SQL -DatabaseName $WorkingServerInstance -SQLCommand 'DISABLE TRIGGER [dbo].[REVISION_DELETE] ON [dbo].[Object]' -ErrorAction Continue
+    Invoke-SQL -DatabaseServer $TargetServerInstanceObject.DatabaseServer -DatabaseInstance $TargetServerInstanceObject.DatabaseInstance -DatabaseName $WorkingServerInstance -SQLCommand 'DISABLE TRIGGER [dbo].[REVISION_UPDATE] ON [dbo].[Object]' -ErrorAction Continue
+    Invoke-SQL -DatabaseServer $TargetServerInstanceObject.DatabaseServer -DatabaseInstance $TargetServerInstanceObject.DatabaseInstance -DatabaseName $WorkingServerInstance -SQLCommand 'DISABLE TRIGGER [dbo].[REVISION_INSERT] ON [dbo].[Object]' -ErrorAction Continue
+    Invoke-SQL -DatabaseServer $TargetServerInstanceObject.DatabaseServer -DatabaseInstance $TargetServerInstanceObject.DatabaseInstance -DatabaseName $WorkingServerInstance -SQLCommand 'DISABLE TRIGGER [dbo].[REVISION_DELETE] ON [dbo].[Object]' -ErrorAction Continue
 
 
     #Import NAV LIcense
@@ -44,16 +44,24 @@
         Get-NAVServerInstance -ServerInstance $WorkingServerInstance | Import-NAVServerLicense -LicenseFile $LicenseFile -Database NavDatabase -WarningAction SilentlyContinue -ErrorAction Stop
         Set-NAVServerInstance -Restart -ServerInstance $WorkingServerInstance -ErrorAction continue
     }
-    
-    #Import unlicensed objects
+     
+    if (!([string]::IsNullOrEmpty($TargetServerInstanceObject.DatabaseInstance))){
+        $DatabaseServer = "$($TargetServerInstanceObject.DatabaseServer)\$($TargetServerInstanceObject.DatabaseInstance)"
+    } else
+    {
+        $DatabaseServer = $TargetServerInstanceObject.DatabaseServer
+    }
+
+    #Import unlicensed objects  
     if ($FobFileForCreatingUnlicensedObjects) {
         Write-host 'Import Fob for Unlicensed objects' -ForegroundColor Green
             $null = 
                 Import-NAVApplicationObject `
+                    -DatabaseServer $DatabaseServer `                    
                     -DatabaseName $WorkingServerInstance `
                     -Path $FobFileForCreatingUnlicensedObjects `
                     -LogPath $LogImportFob `
-                    -NavServerName ([net.dns]::GetHostName()) `
+                    -NavServerName ([net.dns]::GetHostName()) `                    
                     -NavServerInstance $WorkingServerInstance `
                     -confirm:$false `
                     -ErrorAction continue `                    -SynchronizeSchemaChanges No `                    -ImportAction Overwrite
@@ -63,6 +71,7 @@
     Write-Host 'Import Merged Objects' -ForegroundColor Green
     $null = 
         Import-NAVApplicationObject `
+            -DatabaseServer $DatabaseServer `
             -DatabaseName $WorkingServerInstance `
             -Path "$TextFileFolder\*.txt" `
             -LogPath $LogImportText `
@@ -75,6 +84,7 @@
     #Compile Objects
     Write-Host 'Compile Uncompiled' -ForegroundColor Green
     $null = Compile-NAVApplicationObject `
+        -DatabaseServer $DatabaseServer `
         -DatabaseName $WorkingServerInstance `
         -LogPath $LogCompileObjects `
         -SynchronizeSchemaChanges Force `
@@ -84,21 +94,33 @@
         -NavServerInstance $WorkingServerInstance `
         -ErrorAction Continue   
     
+    if ((Get-ChildItem $LogCompileObjects | where Name -eq 'naverrorlog.txt').Count > 0)
+    {        
+        if (!(Confirm-YesOrNo -Title "There are still uncompiled objects" -Message "There are still uncompiled objects `n Do you want to continue and create fob?")){
+            Break    
+        }
+    } 
+
     #Export Result
     if (!($ResultFobFile)){
         $ResultFobFile = Join-Path $WorkingFolder 'result.fob'
     }
     Write-Host "Export $ResultFobFile" -ForegroundColor Green
     $null = Export-NAVApplicationObject `
-    -DatabaseName $WorkingServerInstance `
-    -Path $ResultFobFile `
-    -LogPath $LogResultObjectFile `
-    -ExportTxtSkipUnlicensed `
-    -Force `
-    -ErrorAction continue
-   
+        -DatabaseServer $DatabaseServer `
+        -DatabaseName $WorkingServerInstance `
+        -Path $ResultFobFile `
+        -LogPath $LogResultObjectFile `
+        -ExportTxtSkipUnlicensed `
+        -Force `
+        -ErrorAction        
+
     #Remove WorkingDB
-    Write-Host "Remove Temorary DB $WorkingServerInstance" -ForegroundColor Green
+    if (!(Confirm-YesOrNo -Title "Remove Temporary DB" -Message "Do you want to continue and create remove the temporary DB?")){
+        return (get-item $ResultFobFile) 
+        break   
+    }
+    Write-Host "Remove Temporary DB $WorkingServerInstance" -ForegroundColor Green
     Remove-NAVEnvironment -ServerInstance $WorkingServerInstance -Force
 
     return (get-item $ResultFobFile)

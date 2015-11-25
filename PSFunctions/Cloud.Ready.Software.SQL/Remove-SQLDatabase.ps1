@@ -7,13 +7,21 @@
         [Object]
         $DatabaseServer = [net.dns]::GetHostName(),
         
-        [Parameter(Mandatory=$true, Position=1)]
+        [Parameter(Mandatory=$false, Position=1)]
+        [Object]
+        $DatabaseInstance = '',
+
+        [Parameter(Mandatory=$true, Position=2)]
         [Object]
         $DatabaseName
     )
     
     try{
         $null = import-module sqlps -WarningAction SilentlyContinue
+        if (!([string]::IsNullOrEmpty($DatabaseInstance))){
+            $DatabaseServer = "$($DatabaseServer)\$($DatabaseInstance)"
+        }
+
         $server = New-Object Microsoft.SqlServer.Management.Smo.Server($DatabaseServer)   
         $server.databases[$DatabaseName].Drop()
     } Catch {
