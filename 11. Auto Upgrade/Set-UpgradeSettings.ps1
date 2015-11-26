@@ -1,4 +1,11 @@
-﻿#General
+﻿<#
+This is the settings file for the corresponding scripts in the folder.
+so it should be changed to accomodate the merge you're working on
+
+I would just copy scripts and (this) settings file to workingfolder, and go from there...
+#>
+
+#General
 $UpgradeName = 'FLEETNOLOGY'
 $WorkingFolder = "G:\Merge\_Workingfolder\Upgrade_$UpgradeName"
 $ObjectLibrary = 'G:\Merge\_ObjectLibrary'
