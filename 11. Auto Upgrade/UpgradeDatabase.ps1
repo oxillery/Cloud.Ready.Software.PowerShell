@@ -43,7 +43,9 @@ if ($NumberOfFails -ge 1){
     }
 }
 
-$FilteredMergeResultFolder = Copy-NAVChangedMergedResultFiles -MergeResultObjects $MergeResult.MergeResult
+if (!$MergeResult) {$MergeResult = Import-Clixml -Path "$WorkingFolder\MergeResult.xml"}
+
+$FilteredMergeResultFolder = Copy-NAVChangedMergedResultFiles -MergeResultObjects $MergeResult.MergeResult -DestinationFolder "$WorkingFolder\MergeResult_ChangedOnly"
 
 $FobFile = 
     New-NAVUpgradeFobFromMergedText `
@@ -53,6 +55,8 @@ $FobFile =
         -WorkingFolder $WorkingFolder `
         -ErrorAction Stop `
         -ResultFobFile $ResultObjectFile
+
+break
 
 $UpgradedServerInstance = 
     Start-NAVUpgradeDatabase `

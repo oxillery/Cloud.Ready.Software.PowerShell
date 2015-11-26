@@ -44,15 +44,15 @@
         if ($IsMultitenant) {
             foreach ($Tenant in $Tenants) { 
                 write-Host -ForegroundColor Green "Removing (Tenant)DB $($Tenant.DatabaseName)"
-                Remove-SQLDatabase -DatabaseServer $Tenant.DatabaseServer -DatabaseName $Tenant.DatabaseName -ErrorAction Continue
+                Remove-SQLDatabase -DatabaseServer $Tenant.DatabaseServer -DatabaseInstance $Tenant.DatabaseInstance -DatabaseName $Tenant.DatabaseName -ErrorAction Continue
             }
     
             if ($IsMultitenant) {
                 write-Host -ForegroundColor Green "Removing ApplicationDB $($ServerInstanceObject.DatabaseName)"
-                Remove-SQLDatabase -DatabaseServer $ServerInstanceObject.DatabaseServer -DatabaseName $ServerInstanceObject.DatabaseName 
+                Remove-SQLDatabase -DatabaseServer $ServerInstanceObject.DatabaseServer -DatabaseInstance $ServerInstanceObject.DatabaseInstance -DatabaseName $ServerInstanceObject.DatabaseName 
             }
         } else {
-            Remove-SQLDatabase -DatabaseServer $ServerInstanceObject.DatabaseServer -DatabaseName $ServerInstanceObject.DatabaseName 
+            Remove-SQLDatabase -DatabaseServer $ServerInstanceObject.DatabaseServer -DatabaseInstance $ServerInstanceObject.DatabaseInstance -DatabaseName $ServerInstanceObject.DatabaseName 
         }
         
     }
