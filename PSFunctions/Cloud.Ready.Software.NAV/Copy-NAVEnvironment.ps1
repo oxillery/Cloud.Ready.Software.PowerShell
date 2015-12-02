@@ -23,13 +23,13 @@
         [System.String]
         $ToServerInstance 
      )
-    $ServerInstanceObject = Get-NAVServerInstance -ServerInstance $ServerInstance
+    $ServerInstanceObject = Get-NAVServerInstance4 -ServerInstance $ServerInstance
  
     $ServerInstanceObject | Enable-NAVServerInstancePortSharing 
  
     $BackupFile = $ServerInstanceObject | Backup-NAVDatabase
     
-    New-NAVEnvironment -ServerInstance $ToServerInstance -Databasename $ToServerInstance -BackupFile $BackupFile -EnablePortSharing
+    New-NAVEnvironment -ServerInstance $ToServerInstance -DatabaseServer $ServerInstanceObject.DatabaseServer -DatabaseInstance $ServerInstanceObject.DatabaseInstance -Databasename $ToServerInstance -BackupFile $BackupFile -EnablePortSharing
     
     $backupfile | remove-item -Force
 }

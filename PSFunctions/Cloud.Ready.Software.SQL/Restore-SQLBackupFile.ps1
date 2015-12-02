@@ -10,6 +10,10 @@
         [Parameter(Mandatory=$false)]
         [System.String]
         $DatabaseServer = '.',
+
+        [Parameter(Mandatory=$false)]
+        [System.String]
+        $DatabaseInstance = '',
         
         [Parameter(Mandatory=$true)]
         [System.String]
@@ -26,15 +30,15 @@
     
     if ([String]::IsNullOrEmpty($DatabaseDataPath)){
         $SQLString = "SELECT [Default Data Path] = SERVERPROPERTY('InstanceDefaultDataPath')"
-        $DatabaseDataPath = (invoke-sql -DatabaseServer $DatabaseServer -sqlCommand $SQLString)."Default Data Path"
+        $DatabaseDataPath = (invoke-sql -DatabaseServer $DatabaseServer -DatabaseInstance $DatabaseInstance -sqlCommand $SQLString)."Default Data Path"
     }
     if ([String]::IsNullOrEmpty($DatabaseLogPath)){
         $SQLString = "SELECT [Default Log Path] = SERVERPROPERTY('InstanceDefaultLogPath')"
-        $DatabaseLogPath = (invoke-sql -DatabaseServer $DatabaseServer -sqlCommand $SQLString)."Default Log Path"
+        $DatabaseLogPath = (invoke-sql -DatabaseServer $DatabaseServer -DatabaseInstance $DatabaseInstance -sqlCommand $SQLString)."Default Log Path"
     }
     $SQLString = "RESTORE FILELISTONLY FROM DISK=N'$BackupFile'"
     
-    $DatabaseFileList = Invoke-sql -DatabaseServer $DatabaseServer -sqlCommand $SQLString
+    $DatabaseFileList = Invoke-sql -DatabaseServer $DatabaseServer -DatabaseInstance $DatabaseInstance -sqlCommand $SQLString
     
     $RestoreSQLString = "RESTORE DATABASE [$DatabaseName] FROM DISK = N'$BackupFile' WITH FILE = 1,
     "
@@ -50,7 +54,8 @@
     $RestoreSQLString += 'NOUNLOAD, REPLACE, STATS = 5'
 
     write-Host -ForegroundColor Green "Restoring database $DatabaseName"
-    
-    Invoke-Sqlcmd -ServerInstance $DatabaseServer -Database 'master' -Query $RestoreSQLString -QueryTimeout 600000
+        
+    #Invoke-Sqlcmd -ServerInstance $DatabaseServer -Database 'master' -Query $RestoreSQLString -QueryTimeout 600000
+    Invoke-sql -DatabaseServer $DatabaseServer -DatabaseInstance $DatabaseInstance -DatabaseName 'master' -sqlCommand $RestoreSQLString    
 }
 
