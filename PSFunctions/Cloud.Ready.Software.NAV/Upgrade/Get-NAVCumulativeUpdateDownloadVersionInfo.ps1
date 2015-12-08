@@ -25,7 +25,7 @@
 
         switch ($ResultVersion)
         {
-          '8' {
+          {'8' -or '9'} {
                 $regex = '(?<product>\w+?)\.(?<version>\d+?\.\d+?)\.(?<build>\d+?)\.(?<country>\w+?)\.'
                 $MatchedRegEx = [regex]::Match($ZipFileName, $regex)
         

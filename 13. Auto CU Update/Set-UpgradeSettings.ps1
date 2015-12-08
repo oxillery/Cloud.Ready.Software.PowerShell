@@ -1,16 +1,28 @@
-﻿#General
-$UpgradeName = 'TestCustomer'
-$WorkingFolder = "C:\_Workingfolder\Upgrade_$UpgradeName"
-$ObjectLibrary = 'C:\_ObjectLibrary'
-$ModifiedFolder = 'C:\_Workingfolder\CustomerDBs'
-$NAVLicense = 'C:\_Installs\5230132_003 and 004 IFACTO_NAV2016_BELGIUM_2015 11 03.flf'
+﻿$workingRoot = 'D:\Temp\CU Update\'
+
+# Working Settings
+$logPath = (Join-Path $workingRoot 'log.txt')
+
+#CU Settings:
+$CumulativeUpdateFullPath = 'U:\Software\NAV 2016\CU2\BE'
+$IsoDirectory = 'U:\Software\NAV 2016\ISO'
+$CUDownloadFile = 'U:\Software\NAV 2016\CU2\488771_NLD_i386_zip.exe' #Required
+$TmpLocation = 'P:\_Workingfolder\Temp' #Required
+
+#General
+$UpgradeName = 'DynamicsNAV90' #Parameter
+$WorkingFolder = (Join-Path $workingRoot "_Workingfolder\Upgrade_$UpgradeName")
+$ObjectLibrary = (Join-Path $workingRoot '_ObjectLibrary')
+$ModifiedFolder = (Join-path $workingRoot '_Workingfolder\CustomerDBs')
+$NAVLicense = (Join-Path $workingRoot  'P:\_Workingfolder\_Installs\AstenaNAV2015_20150310.flf'
 $UpgradeCodeunitsFullPath = 'E:\UpgradeToolKit\Local Objects\Upgrade800900.BE.fob'
 $VersionListPrefixes = 'NAVW1', 'NAVBE'
 
 
 #Original Version
-$OriginalVersion = 'NAV2015_CUx_BE'
+$OriginalVersion = 'NAV2016_BE'
 $OriginalObjects = join-path $ObjectLibrary "$($OriginalVersion).txt"
+$OriginalServerInstance = 'DynamicsNAV90'
 
 #Modified Version
 $ModifiedServerInstance = $UpgradeName

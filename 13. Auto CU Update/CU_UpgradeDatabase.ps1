@@ -2,13 +2,18 @@
 
 #Install the CU
 $IsoFile = 
-    New-NAVCumulativeUpdateISOFile `
-        -CumulativeUpdateFullPath $CUDownloadFile `
+    New-NAVCumulativeUpdateISOFile         
+        -CumulativeUpdateFullPath $CUDownloadFile 
         -IsoDirectory $IsoDirectory
+        -TmpLocation $TmpLocation
 
 Get-NAVCumulativeUpdateDownloadVersionInfo -SourcePath $CUDownloadFile
 
-Repair-NAV -DVDFolder $DVDFolder
+#Repair NAV With New Update
+$Volume = Mount-DiskImage $IsoFile -PassThru | Get-Volume
+$drive = $Volume.DriveLetter + ':'
+Repair-NAVApplication -DVDFolder $drive -Log $TmpLocation
+Dismount-DiskImage $IsoFile
 
 #TODO: Load NA Cmdlets?
 
