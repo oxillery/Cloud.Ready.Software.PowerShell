@@ -29,7 +29,7 @@
  
     $BackupFile = $ServerInstanceObject | Backup-NAVDatabase
     
-    New-NAVEnvironment -ServerInstance $ToServerInstance -DatabaseServer $ServerInstanceObject.DatabaseServer -DatabaseInstance $ServerInstanceObject.DatabaseInstance -Databasename $ToServerInstance -BackupFile $BackupFile -EnablePortSharing
+    New-NAVEnvironment -ServerInstance $ToServerInstance -DatabaseServer $ServerInstanceObject.DatabaseServer -DatabaseInstance $ServerInstanceObject.DatabaseInstance -Databasename $ToServerInstance -ManagementPort $ServerInstanceObject.ManagementServicesPort -ClientServicesPort $ServerInstanceObject.ClientServicesPort -BackupFile $BackupFile -EnablePortSharing
     
     $backupfile | remove-item -Force
 }

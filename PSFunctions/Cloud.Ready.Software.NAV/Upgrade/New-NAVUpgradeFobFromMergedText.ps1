@@ -55,48 +55,20 @@
     #Import unlicensed objects  
     if ($FobFileForCreatingUnlicensedObjects) {
         Write-host 'Import Fob for Unlicensed objects' -ForegroundColor Green
-            $null = 
-                Import-NAVApplicationObject `
-                    -DatabaseServer $DatabaseServer `                    
-                    -DatabaseName $WorkingServerInstance `
-                    -Path $FobFileForCreatingUnlicensedObjects `
-                    -LogPath $LogImportFob `
-                    -NavServerName ([net.dns]::GetHostName()) `                    
-                    -NavServerInstance $WorkingServerInstance `
-                    -confirm:$false `
-                    -ErrorAction continue `                    -SynchronizeSchemaChanges No `                    -ImportAction Overwrite
+            $null = Import-NAVApplicationObject -DatabaseServer $DatabaseServer -DatabaseName $WorkingServerInstance -Path $FobFileForCreatingUnlicensedObjects -LogPath $LogImportFob -NavServerName ([net.dns]::GetHostName()) -NavServerInstance $WorkingServerInstance -confirm:$false -ErrorAction continue -SynchronizeSchemaChanges No -ImportAction Overwrite
     }
     
     #Import Objects
     Write-Host 'Import Merged Objects' -ForegroundColor Green
-    $null = 
-        Import-NAVApplicationObject `
-            -DatabaseServer $DatabaseServer `
-            -DatabaseName $WorkingServerInstance `
-            -Path "$TextFileFolder\*.txt" `
-            -LogPath $LogImportText `
-            -NavServerName ([net.dns]::GetHostName()) `
-            -NavServerInstance $WorkingServerInstance `
-            -confirm:$false `
-            -ErrorAction continue `
-            -ImportAction Overwrite
+    $null = Import-NAVApplicationObject -DatabaseServer $DatabaseServer -DatabaseName $WorkingServerInstance -Path "$TextFileFolder\*.txt" -LogPath $LogImportText -NavServerName ([net.dns]::GetHostName()) -NavServerInstance $WorkingServerInstance -confirm:$false -ErrorAction continue -ImportAction Overwrite
        
     #Compile Objects
     Write-Host 'Compile Uncompiled' -ForegroundColor Green
-    $null = Compile-NAVApplicationObject `
-        -DatabaseServer $DatabaseServer `
-        -DatabaseName $WorkingServerInstance `
-        -LogPath $LogCompileObjects `
-        -SynchronizeSchemaChanges Force `
-        -Filter 'Compiled=0' `
-        -Recompile `
-        -NavServerName ([net.dns]::GetHostName()) `
-        -NavServerInstance $WorkingServerInstance `
-        -ErrorAction Continue   
+    $null = Compile-NAVApplicationObject -DatabaseServer $DatabaseServer -DatabaseName $WorkingServerInstance -LogPath $LogCompileObjects -SynchronizeSchemaChanges Force -Filter 'Compiled=0' -Recompile -NavServerName ([net.dns]::GetHostName()) -NavServerInstance $WorkingServerInstance -ErrorAction Continue   
     
-    if ((Get-ChildItem $LogCompileObjects | where Name -eq 'naverrorlog.txt').Count > 0)
+    if(Test-Path (Join-Path $LogCompileObjects 'naverrorlog.txt'))
     {        
-        if (!(Confirm-YesOrNo -Title "There are still uncompiled objects" -Message "There are still uncompiled objects `n Do you want to continue and create fob?")){
+        if (!(Confirm-YesOrNo -Title 'There are still uncompiled objects' -Message "There are still uncompiled objects `n Do you want to continue and create fob?")){
             Break    
         }
     } 
@@ -106,17 +78,10 @@
         $ResultFobFile = Join-Path $WorkingFolder 'result.fob'
     }
     Write-Host "Export $ResultFobFile" -ForegroundColor Green
-    $null = Export-NAVApplicationObject `
-        -DatabaseServer $DatabaseServer `
-        -DatabaseName $WorkingServerInstance `
-        -Path $ResultFobFile `
-        -LogPath $LogResultObjectFile `
-        -ExportTxtSkipUnlicensed `
-        -Force `
-        -ErrorAction        
+    $null = Export-NAVApplicationObject -DatabaseServer $DatabaseServer -DatabaseName $WorkingServerInstance -Path $ResultFobFile -LogPath $LogResultObjectFile -ExportTxtSkipUnlicensed -Force -ErrorAction Stop
 
     #Remove WorkingDB
-    if (!(Confirm-YesOrNo -Title "Remove Temporary DB" -Message "Do you want to continue and create remove the temporary DB?")){
+    if (!(Confirm-YesOrNo -Title 'Remove Temporary DB' -Message 'Do you want to continue and create remove the temporary DB?')){
         return (get-item $ResultFobFile) 
         break   
     }

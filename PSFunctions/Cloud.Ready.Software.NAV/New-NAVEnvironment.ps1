@@ -8,7 +8,9 @@
         [String]$BackupFile,
         [switch]$EnablePortSharing,
         [Switch]$StartWindowsClient,
-        [String]$LicenseFile
+        [String]$LicenseFile,
+        [int]$ManagementPort = 7045,
+        [int]$ClientServicesPort = 7046
     )
 
     if ([String]::IsNullOrEmpty($Databasename)){
@@ -29,8 +31,8 @@
             -ServerInstance $ServerInstance `
             -DatabaseServer $DatabaseServer `
             -DatabaseInstance $DatabaseInstance `
-            -ManagementServicesPort 7045 `
-            -ClientServicesPort 7046 `
+            -ManagementServicesPort $ManagementPort `
+            -ClientServicesPort $ClientServicesPort `
             -DatabaseName $Databasename          
 
     $ServerInstanceObject = Get-NAVServerInstance4 -ServerInstance $ServerInstance
@@ -52,15 +54,16 @@
         -DatabaseName $ServerInstanceObject.DatabaseName `        -SQLCommand "ALTER ROLE [db_owner] ADD MEMBER [$($ServerInstanceObject.ServiceAccount)]" `
         -ErrorAction SilentlyContinue
          
+    #Enable before attempting start
+    if ($EnablePortSharing) {
+        Enable-NAVServerInstancePortSharing -ServerInstance $ServerInstance
+    }
+    
     $null = Set-NAVServerInstance -Start -ServerInstance $ServerInstance
     if($LicenseFile){  
         Write-Host -ForegroundColor Green -Object 'Importing license..'
         $null = $ServerInstanceObject | Import-NAVServerLicense -LicenseFile $LicenseFile -Force -WarningAction SilentlyContinue
-    }
-            
-    if ($EnablePortSharing) {
-        Enable-NAVServerInstancePortSharing -ServerInstance $ServerInstance
-    }
+    }    
     
     if ($StartWindowsClient) {
         Start-NAVWindowsClient `

@@ -14,7 +14,11 @@
         $null = sc.exe config (get-service NetTcpPortSharing).Name Start= Auto
         $null = Start-service NetTcpPortSharing
     
-        $null = sc.exe config (get-service  "*$ServerInstance*").Name depend= HTTP/NetTcpPortSharing
+        #Enable port sharing for all services with the same like name (usefull when creating sandboxes on new instances)
+        ForEach($name in (get-service  "*$ServerInstance*").Name)
+        { 
+            $null = sc.exe config $name depend= HTTP/NetTcpPortSharing 
+        }        
     
         Set-NAVServerInstance -ServerInstance $ServerInstance -Start 
     }
